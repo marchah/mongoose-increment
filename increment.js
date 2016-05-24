@@ -133,7 +133,7 @@ function initCounter(options) {
  * @param {Object} schema Mongoose schema
  * @param {Options} options Additional options for autoincremented field
  *   @property {String}           modelName   mongoose model name
- *   @property {String}           field       mongoose field name
+ *   @property {String}           fieldName       mongoose increment field name
  *   @property {Integer}          [start]     start number for counter, default `1`
  *   @property {Integer}          [increment] number to increment counter, default `1`
  *   @property {String/Function}  [prefix]    counter prefix, default ``
@@ -146,8 +146,8 @@ function plugin(schema, options) {
   if (!_.isString(options.modelName)) {
     throw new Error('Mongoose Increment Plugin: require `options.modelName` parameter');
   }
-  if (!_.isString(options.field)) {
-    throw new Error('Mongoose Increment Plugin: require `options.field` parameter');
+  if (!_.isString(options.fieldName)) {
+    throw new Error('Mongoose Increment Plugin: require `options.fieldName` parameter');
   }
   if (options.start && !_.isInteger(options.start)) {
     throw new Error('Mongoose Increment Plugin: require `options.start` parameter must be an integer');
@@ -157,7 +157,7 @@ function plugin(schema, options) {
   }
   const opts = {
     model: options.modelName,
-    field: options.field,
+    field: options.fieldName,
     start: options.start || 1,
     increment: options.increment || 1,
     prefix: options.prefix || '',

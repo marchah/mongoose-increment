@@ -12,7 +12,7 @@ const DefaultSchema = new mongoose.Schema({
 
 DefaultSchema.plugin(increment, {
   modelName: 'Default',
-  field: 'increment_field',
+  fieldName: 'increment_field',
 });
 
 const BasicSuffixPrefixSchema = new mongoose.Schema({
@@ -24,7 +24,7 @@ const BasicSuffixPrefixSchema = new mongoose.Schema({
 
 BasicSuffixPrefixSchema.plugin(increment, {
   modelName: 'BasicSuffixPrefix',
-  field: 'increment_field',
+  fieldName: 'increment_field',
   start: 500,
   prefix: 'P',
   suffix: 'S',
@@ -43,7 +43,7 @@ const FunctionSuffixPrefixSchema = new mongoose.Schema({
 
 FunctionSuffixPrefixSchema.plugin(increment, {
   modelName: 'FunctionSuffixPrefix',
-  field: 'increment_field',
+  fieldName: 'increment_field',
   start: 300,
   increment: 3,
   prefix: (doc) => {  return doc.flag ? 'P-TRUE-' : 'P-FALSE-' },

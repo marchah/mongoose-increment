@@ -66,7 +66,7 @@ describe('Unit Testing ->', () => {
         done();
       }
     });
-    it('should throw error when `options.field` is missing', (done) => {
+    it('should throw error when `options.fieldName` is missing', (done) => {
       const TestSchema = new mongoose.Schema({
         label: {
           type: String,
@@ -80,7 +80,7 @@ describe('Unit Testing ->', () => {
       }
       catch (error) {
         expect(error).that.is.an.instanceof(Error)
-          .to.have.property('message', 'Mongoose Increment Plugin: require `options.field` parameter');
+          .to.have.property('message', 'Mongoose Increment Plugin: require `options.fieldName` parameter');
         done();
       }
     });
@@ -95,7 +95,7 @@ describe('Unit Testing ->', () => {
       try {
         TestSchema.plugin(increment, {
           modelName: 'Test',
-          field: 'increment_field',
+          fieldName: 'increment_field',
           start: 12.12,
         });
         done('Not supposed to happend');
@@ -117,7 +117,7 @@ describe('Unit Testing ->', () => {
       try {
         TestSchema.plugin(increment, {
           modelName: 'Test',
-          field: 'increment_field',
+          fieldName: 'increment_field',
           increment: '12',
         });
         done('Not supposed to happend');
@@ -138,7 +138,7 @@ describe('Unit Testing ->', () => {
       expect(TestSchema.paths.increment_field).to.not.exist;
       TestSchema.plugin(increment, {
         modelName: 'Test',
-        field: 'increment_field',
+        fieldName: 'increment_field',
       });
       expect(TestSchema.paths.increment_field).to.exist;
     });
@@ -152,7 +152,7 @@ describe('Unit Testing ->', () => {
       expect(TestSchema.methods.nextSequence).to.not.exist;
       TestSchema.plugin(increment, {
         modelName: 'Test',
-        field: 'increment_field',
+        fieldName: 'increment_field',
       });
       expect(TestSchema.methods.nextSequence).to.exist;
     });
@@ -166,7 +166,7 @@ describe('Unit Testing ->', () => {
       expect(TestSchema.statics.resetSequence).to.not.exist;
       TestSchema.plugin(increment, {
         modelName: 'Test',
-        field: 'increment_field',
+        fieldName: 'increment_field',
       });
       expect(TestSchema.statics.resetSequence).to.exist;
     });
