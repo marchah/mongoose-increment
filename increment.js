@@ -132,7 +132,7 @@ function initCounter(options) {
  *
  * @param {Object} schema Mongoose schema
  * @param {Options} options Additional options for autoincremented field
- *   @property {String}           model       mongoose model name
+ *   @property {String}           modelName   mongoose model name
  *   @property {String}           field       mongoose field name
  *   @property {Integer}          [start]     start number for counter, default `1`
  *   @property {Integer}          [increment] number to increment counter, default `1`
