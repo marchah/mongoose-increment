@@ -228,11 +228,10 @@ describe('Unit Testing ->', () => {
           }).catch(done);
       });
       it('should reset sequence and delete the first doc created', (done) => {
-        models.Default.resetSequence((err) => {
-          if (err) return done(err);
-
-          return savedDoc.remove(done);
-        });
+        models.Default.resetSequence()
+          .then(() => {
+            return savedDoc.remove(done);
+          }).catch(done);
       });
       it('should save `increment_field` field with `1` as value by default 2/2', (done) => {
         const doc = new models.Default({ label: 'label_6' });
@@ -249,7 +248,10 @@ describe('Unit Testing ->', () => {
     describe('Basic Suffix/Prefix And Start Options', () => {
       let savedDoc;
       it('should reset sequence', (done) => {
-        models.BasicSuffixPrefix.resetSequence(done);
+        models.BasicSuffixPrefix.resetSequence()
+          .then(() => {
+            done();
+          }).catch(done);
       });
       it('should save `increment_field` field with `P500S` as value by default 1/2', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_1' });
@@ -305,11 +307,10 @@ describe('Unit Testing ->', () => {
           }).catch(done);
       });
       it('should reset sequence and delete the first doc created', (done) => {
-        models.BasicSuffixPrefix.resetSequence((err) => {
-          if (err) return done(err);
-
-          return savedDoc.remove(done);
-        });
+        models.BasicSuffixPrefix.resetSequence()
+          .then(() => {
+            return savedDoc.remove(done);
+          }).catch(done);
       });
       it('should save `increment_field` field with `P500S` as value by default 2/2', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_6' });
@@ -378,11 +379,10 @@ describe('Unit Testing ->', () => {
           }).catch(done);
       });
       it('should reset sequence and delete the first doc created', (done) => {
-        models.FunctionSuffixPrefix.resetSequence((err) => {
-          if (err) return done(err);
-
-          return savedDoc.remove(done);
-        });
+        models.FunctionSuffixPrefix.resetSequence()
+          .then(() => {
+            return savedDoc.remove(done);
+          }).catch(done);
       });
       it('should save `increment_field` field with `P-TRUE-300-S-TRUE` as value by default 2/2', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_6', flag: true });

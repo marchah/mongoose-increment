@@ -38,15 +38,13 @@ const Counter = mongoose.model('_Counter', CounterSchema);
  * Reset counter sequence start
  *
  * @param {Object} options Mongoose plugin options
- * @param {Function} next Callback handler
+ * @return {Promise} Promise fulfilled when sequence has been reset
  */
-function resetSequence(options, next) {
-  Counter.findOneAndUpdate(
+function resetSequence(options) {
+  return Counter.findOneAndUpdate(
     { model: options.model, field: options.field },
     { count: options.start - options.increment },
-    { new: true, upsert: true },
-    (err, doc) => (err ? next(err) : next(null, doc))
-  );
+    { new: true, upsert: true });
 }
 
 /**
@@ -99,7 +97,7 @@ function nextCount(options, resource, next) {
  * Retrieve the next sequence in the counter and update field
  *
  * @param {Object} options Counter options
- * @return {Promise} Promise fulfilled when increment field have been setted
+ * @return {Promise} Promise fulfilled when increment field has been setted
  */
 function nextSequence(options) {
   const resource = this;
