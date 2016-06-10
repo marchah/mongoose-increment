@@ -156,6 +156,20 @@ describe('Unit Testing ->', () => {
       });
       expect(TestSchema.methods.nextSequence).to.exist;
     });
+    it('should add method `parseSequence` to mongoose schema', () => {
+      const TestSchema = new mongoose.Schema({
+        label: {
+          type: String,
+          required: true,
+        },
+      });
+      expect(TestSchema.methods.parseSequence).to.not.exist;
+      TestSchema.plugin(increment, {
+        modelName: 'Test',
+        fieldName: 'increment_field',
+      });
+      expect(TestSchema.methods.parseSequence).to.exist;
+    });
     it('should add static `resetSequence` to mongoose schema', () => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -185,6 +199,13 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+      it('should return correct parsed sequence', () => {
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: '',
+          counter: '1',
+          suffix: '',
+        });
+      });
       it('should save `increment_field` field with `2` as value by default', (done) => {
         const doc = new models.Default({ label: 'label_2' });
 
@@ -192,6 +213,11 @@ describe('Unit Testing ->', () => {
           .then((res) => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', '2');
+            expect(doc.parseSequence()).to.eql({
+              prefix: '',
+              counter: '2',
+              suffix: '',
+            });
             done();
           }).catch(done);
       });
@@ -240,6 +266,11 @@ describe('Unit Testing ->', () => {
           .then((res) => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', '1');
+            expect(doc.parseSequence()).to.eql({
+              prefix: '',
+              counter: '1',
+              suffix: '',
+            });
             savedDoc = doc;
             done();
           }).catch(done);
@@ -264,6 +295,13 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+      it('should return correct parsed sequence', () => {
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: 'P',
+          counter: '500',
+          suffix: 'S',
+        });
+      });
       it('should save `increment_field` field with `P501S` as value by default', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_2' });
 
@@ -271,6 +309,11 @@ describe('Unit Testing ->', () => {
           .then((res) => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', 'P501S');
+            expect(doc.parseSequence()).to.eql({
+              prefix: 'P',
+              counter: '501',
+              suffix: 'S',
+            });
             done();
           }).catch(done);
       });
@@ -319,6 +362,11 @@ describe('Unit Testing ->', () => {
           .then((res) => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', 'P500S');
+            expect(doc.parseSequence()).to.eql({
+              prefix: 'P',
+              counter: '500',
+              suffix: 'S',
+            });
             done();
           }).catch(done);
       });
@@ -336,6 +384,13 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+      it('should return correct parsed sequence', () => {
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: 'P-TRUE-',
+          counter: '300',
+          suffix: '-S-TRUE',
+        });
+      });
       it('should save `increment_field` field with `P-FALSE-303-S-FALSE` as value by default', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_2', flag: false  });
 
@@ -343,6 +398,11 @@ describe('Unit Testing ->', () => {
           .then((res) => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', 'P-FALSE-303-S-FALSE');
+            expect(doc.parseSequence()).to.eql({
+              prefix: 'P-FALSE-',
+              counter: '303',
+              suffix: '-S-FALSE',
+            });
             done();
           }).catch(done);
       });
@@ -391,6 +451,11 @@ describe('Unit Testing ->', () => {
           .then((res) => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', 'P-TRUE-300-S-TRUE');
+            expect(doc.parseSequence()).to.eql({
+              prefix: 'P-TRUE-',
+              counter: '300',
+              suffix: '-S-TRUE',
+            });
             done();
           }).catch(done);
       });

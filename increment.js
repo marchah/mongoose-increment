@@ -94,6 +94,39 @@ function nextCount(options, resource, next) {
 }
 
 /**
+ * Parse the sequence to get the prefix, counter and suffix
+ *
+ * @param {Object} options Counter options
+ *
+ * @return {Object} sequence parsed
+ */
+function parseSequence(options) {
+  const parsed = {
+    prefix: '',
+    counter: '',
+    suffix: '',
+  };
+
+  if (_.isFunction(options.prefix)) {
+    parsed.prefix = options.prefix(this);
+  }
+  else {
+    parsed.prefix = options.prefix.toString();
+  }
+
+  if (_.isFunction(options.suffix)) {
+    parsed.suffix = options.suffix(this);
+  }
+  else {
+    parsed.suffix = options.suffix.toString();
+  }
+
+  parsed.counter = this[options.field].substring(parsed.prefix.length, this[options.field].length - parsed.suffix.length);
+
+  return parsed;
+}
+
+/**
  * Retrieve the next sequence in the counter and update field
  *
  * @param {Object} options Counter options
@@ -173,6 +206,7 @@ function plugin(schema, options) {
   schema.add(fieldSchema);
 
   schema.methods.nextSequence = _.partial(nextSequence, opts);
+  schema.methods.parseSequence = _.partial(parseSequence, opts);
 
   schema.statics.resetSequence = _.partial(resetSequence, opts);
 
