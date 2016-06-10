@@ -26,6 +26,10 @@ $ npm install mongoose-increment
 
 Return a fulfilled promise when increment field has been setted
 
+#### instance.parseSequence()
+
+Return an object which contain instance prefix, suffix and counter.
+
 ### Statics
 
 #### Model.resetSequence()
