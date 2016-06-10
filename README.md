@@ -26,6 +26,10 @@ $ npm install mongoose-increment
 
 Return a fulfilled promise when increment field has been setted
 
+#### instance.parseSequence()
+
+Return an object which contain instance prefix, suffix and counter.
+
 ### Statics
 
 #### Model.resetSequence()
@@ -82,9 +86,12 @@ var TestIncrement = mongoose.model('Test_increment', TestSchema);
 
 var doc1 = new TestIncrement({ label: 'label_1' });
 doc1.save(); // doc saved with `increment_field` === '300'
+doc1.parseSequence(); // => { prefix: '', counter: '300', suffix: '' }
 
 var doc2 = new TestIncrement({ label: 'label_2' });
 doc2.nextSequence(); // `increment_field` === '303'
+doc1.parseSequence(); // => { prefix: '', counter: '303', suffix: '' }
+
 ````
 
 ### `prefix` and `suffix` set
@@ -116,11 +123,13 @@ var TestIncrement = mongoose.model('Test_increment', TestSchema);
 
 var doc1 = new TestIncrement({ label: 'label_1', flag: true });
 doc1.save(); // doc saved with `increment_field` === 'P1TRUE'
+doc1.parseSequence(); // => { prefix: 'P', counter: '1', suffix: 'TRUE' }
 
 TestIncrement.resetSequence();
 
 var doc2 = new TestIncrement({ label: 'label_1', flag: false });
 doc2.save(); // doc saved with `increment_field` === 'P1FALSE'
+doc2.parseSequence(); // => { prefix: 'P', counter: '1', suffix: 'FALSE' }
 ````
 
 ## Note
