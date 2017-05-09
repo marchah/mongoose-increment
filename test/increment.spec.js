@@ -25,6 +25,7 @@ describe('Unit Testing ->', () => {
     });
     mongoose.connection.on('error', done);
   });
+
   after((done) => {
     mongoose.connection.close(done);
   });
@@ -48,6 +49,7 @@ describe('Unit Testing ->', () => {
         done();
       }
     });
+
     it('should throw error when `options.modelName` is missing', (done) => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -66,6 +68,7 @@ describe('Unit Testing ->', () => {
         done();
       }
     });
+
     it('should throw error when `options.fieldName` is missing', (done) => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -84,6 +87,7 @@ describe('Unit Testing ->', () => {
         done();
       }
     });
+
     it('should throw error when `options.start` is not an integer', (done) => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -106,6 +110,7 @@ describe('Unit Testing ->', () => {
         done();
       }
     });
+
     it('should throw error when `options.increment` is not an integer', (done) => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -128,6 +133,7 @@ describe('Unit Testing ->', () => {
         done();
       }
     });
+
     it('should add field `increment_field` to mongoose schema', () => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -142,6 +148,7 @@ describe('Unit Testing ->', () => {
       });
       expect(TestSchema.paths.increment_field).to.exist;
     });
+
     it('should add method `nextSequence` to mongoose schema', () => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -156,6 +163,7 @@ describe('Unit Testing ->', () => {
       });
       expect(TestSchema.methods.nextSequence).to.exist;
     });
+
     it('should add method `parseSequence` to mongoose schema', () => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -170,6 +178,7 @@ describe('Unit Testing ->', () => {
       });
       expect(TestSchema.methods.parseSequence).to.exist;
     });
+
     it('should add static `resetSequence` to mongoose schema', () => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -185,9 +194,11 @@ describe('Unit Testing ->', () => {
       expect(TestSchema.statics.resetSequence).to.exist;
     });
   });
+
   describe('Usage', () => {
     describe('Default Options', () => {
       let savedDoc;
+
       it('should save `increment_field` field with `1` as value by default 1/2', (done) => {
         const doc = new models.Default({ label: 'label_1' });
 
@@ -199,6 +210,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should return correct parsed sequence', () => {
         expect(savedDoc.parseSequence()).to.eql({
           prefix: '',
@@ -206,6 +218,7 @@ describe('Unit Testing ->', () => {
           suffix: '',
         });
       });
+
       it('should save `increment_field` field with `2` as value by default', (done) => {
         const doc = new models.Default({ label: 'label_2' });
 
@@ -221,6 +234,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should set `increment_field` field with `3` when call method `nextSequence`', (done) => {
         const doc = new models.Default({ label: 'label_3' });
 
@@ -231,6 +245,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should not changed `increment_field` is doc is not new', (done) => {
         expect(savedDoc).that.is.an('object')
           .to.have.property('increment_field', '1');
@@ -243,6 +258,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should not set `increment_field` if doc is new and `increment_field` is not undefined', (done) => {
         const doc = new models.Default({ label: 'label_5', increment_field: 99 });
 
@@ -253,12 +269,14 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should reset sequence and delete the first doc created', (done) => {
         models.Default.resetSequence()
           .then(() => {
             return savedDoc.remove(done);
           }).catch(done);
       });
+
       it('should save `increment_field` field with `1` as value by default 2/2', (done) => {
         const doc = new models.Default({ label: 'label_6' });
 
@@ -276,14 +294,17 @@ describe('Unit Testing ->', () => {
           }).catch(done);
       });
     });
+
     describe('Basic Suffix/Prefix And Start Options', () => {
       let savedDoc;
+
       it('should reset sequence', (done) => {
         models.BasicSuffixPrefix.resetSequence()
           .then(() => {
             done();
           }).catch(done);
       });
+
       it('should save `increment_field` field with `P500S` as value by default 1/2', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_1' });
 
@@ -295,6 +316,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should return correct parsed sequence', () => {
         expect(savedDoc.parseSequence()).to.eql({
           prefix: 'P',
@@ -302,6 +324,7 @@ describe('Unit Testing ->', () => {
           suffix: 'S',
         });
       });
+
       it('should save `increment_field` field with `P501S` as value by default', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_2' });
 
@@ -317,6 +340,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should set `increment_field` field with `P502S` when call method `nextSequence`', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_3' });
 
@@ -327,6 +351,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should not changed `increment_field` is doc is not new', (done) => {
         expect(savedDoc).that.is.an('object')
           .to.have.property('increment_field', 'P500S');
@@ -339,6 +364,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should not set `increment_field` if doc is new and `increment_field` is not undefined', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_5', increment_field: 99 });
 
@@ -349,12 +375,14 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should reset sequence and delete the first doc created', (done) => {
         models.BasicSuffixPrefix.resetSequence()
           .then(() => {
             return savedDoc.remove(done);
           }).catch(done);
       });
+
       it('should save `increment_field` field with `P500S` as value by default 2/2', (done) => {
         const doc = new models.BasicSuffixPrefix({ label: 'label_6' });
 
@@ -371,8 +399,10 @@ describe('Unit Testing ->', () => {
           }).catch(done);
       });
     });
+
     describe('Function Suffix/Prefix And Start And Increment Options', () => {
       let savedDoc;
+
       it('should save `increment_field` field with `P-TRUE-300-S-TRUE` as value by default 1/2', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_1', flag: true });
 
@@ -384,6 +414,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should return correct parsed sequence', () => {
         expect(savedDoc.parseSequence()).to.eql({
           prefix: 'P-TRUE-',
@@ -391,6 +422,7 @@ describe('Unit Testing ->', () => {
           suffix: '-S-TRUE',
         });
       });
+
       it('should save `increment_field` field with `P-FALSE-303-S-FALSE` as value by default', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_2', flag: false  });
 
@@ -406,6 +438,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should set `increment_field` field with `P-TRUE-306-S-TRUE` when call method `nextSequence`', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_3', flag: true  });
 
@@ -416,6 +449,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should not changed `increment_field` is doc is not new', (done) => {
         expect(savedDoc).that.is.an('object')
           .to.have.property('increment_field', 'P-TRUE-300-S-TRUE');
@@ -428,6 +462,7 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should not set `increment_field` if doc is new and `increment_field` is not undefined', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_5', flag: true, increment_field: 99 });
 
@@ -438,12 +473,14 @@ describe('Unit Testing ->', () => {
             done();
           }).catch(done);
       });
+
       it('should reset sequence and delete the first doc created', (done) => {
         models.FunctionSuffixPrefix.resetSequence()
           .then(() => {
             return savedDoc.remove(done);
           }).catch(done);
       });
+
       it('should save `increment_field` field with `P-TRUE-300-S-TRUE` as value by default 2/2', (done) => {
         const doc = new models.FunctionSuffixPrefix({ label: 'label_6', flag: true });
 
