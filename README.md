@@ -39,7 +39,7 @@ Return a fulfilled promise when sequence has been reset
 
 ## Examples
 
-### default options
+### default option
 ````javascript
 var mongoose = require('mongoose');
 var increment = require('mongoose-increment');
@@ -63,7 +63,7 @@ var doc = new TestIncrement({ label: 'label_1' });
 doc.save(); // doc saved with `increment_field` === 1
 ````
 
-### type options
+### type option
 ````javascript
 var mongoose = require('mongoose');
 var increment = require('mongoose-increment');
