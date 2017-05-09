@@ -1,6 +1,6 @@
 {
   "name": "mongoose-increment",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "main": "./increment.js",
   "description": "mongoose increment plugin",
   "scripts": {
