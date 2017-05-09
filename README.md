@@ -13,6 +13,7 @@ $ npm install mongoose-increment
 
 ### Options
 
+* `type`      {Type} field type (optional, default value is `Number`)
 * `modelName` {String} mongoose model name
 * `fieldName` {String} mongoose increment field name
 * `start`     {Integer} start number for counter (optional, default `1`)
@@ -59,6 +60,31 @@ var TestIncrement = mongoose.model('Test_increment', TestSchema);
 
 var doc = new TestIncrement({ label: 'label_1' });
 
+doc.save(); // doc saved with `increment_field` === 1
+````
+
+### type options
+````javascript
+var mongoose = require('mongoose');
+var increment = require('mongoose-increment');
+
+var TestSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+
+TestSchema.plugin(increment, {
+  type: String,
+  modelName: 'Test_increment',
+  fieldName: 'increment_field',
+});
+
+var TestIncrement = mongoose.model('Test_increment', TestSchema);
+
+var doc = new TestIncrement({ label: 'label_1' });
+
 doc.save(); // doc saved with `increment_field` === '1'
 ````
 
@@ -85,12 +111,12 @@ TestSchema.plugin(increment, {
 var TestIncrement = mongoose.model('Test_increment', TestSchema);
 
 var doc1 = new TestIncrement({ label: 'label_1' });
-doc1.save(); // doc saved with `increment_field` === '300'
-doc1.parseSequence(); // => { prefix: '', counter: '300', suffix: '' }
+doc1.save(); // doc saved with `increment_field` === 300
+doc1.parseSequence(); // => { prefix: '', counter: 300, suffix: '' }
 
 var doc2 = new TestIncrement({ label: 'label_2' });
-doc2.nextSequence(); // `increment_field` === '303'
-doc1.parseSequence(); // => { prefix: '', counter: '303', suffix: '' }
+doc2.nextSequence(); // `increment_field` === 303
+doc1.parseSequence(); // => { prefix: '', counter: 303, suffix: '' }
 
 ````
 
@@ -111,6 +137,7 @@ var TestSchema = new mongoose.Schema({
 });
 
 TestSchema.plugin(increment, {
+  type: String,
   modelName: 'Test_increment',
   fieldName: 'increment_field',
   prefix: 'P',
