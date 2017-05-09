@@ -15,6 +15,19 @@ DefaultSchema.plugin(increment, {
   fieldName: 'increment_field',
 });
 
+const StringSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+
+StringSchema.plugin(increment, {
+  type: String,
+  modelName: 'DefaultString',
+  fieldName: 'increment_field',
+});
+
 const BasicSuffixPrefixSchema = new mongoose.Schema({
   label: {
     type: String,
@@ -24,6 +37,22 @@ const BasicSuffixPrefixSchema = new mongoose.Schema({
 
 BasicSuffixPrefixSchema.plugin(increment, {
   modelName: 'BasicSuffixPrefix',
+  fieldName: 'increment_field',
+  start: 500,
+  prefix: 1,
+  suffix: 9,
+});
+
+const BasicStringSuffixPrefixSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+
+BasicStringSuffixPrefixSchema.plugin(increment, {
+  type: String,
+  modelName: 'BasicStringSuffixPrefix',
   fieldName: 'increment_field',
   start: 500,
   prefix: 'P',
@@ -42,6 +71,7 @@ const FunctionSuffixPrefixSchema = new mongoose.Schema({
 });
 
 FunctionSuffixPrefixSchema.plugin(increment, {
+  type: String,
   modelName: 'FunctionSuffixPrefix',
   fieldName: 'increment_field',
   start: 300,
@@ -52,6 +82,8 @@ FunctionSuffixPrefixSchema.plugin(increment, {
 
 module.exports = {
   Default: mongoose.model('Default', DefaultSchema),
+  String: mongoose.model('String', StringSchema),
   BasicSuffixPrefix: mongoose.model('BasicSuffixPrefix', BasicSuffixPrefixSchema),
+  BasicStringSuffixPrefix: mongoose.model('BasicStringSuffixPrefix', BasicStringSuffixPrefixSchema),
   FunctionSuffixPrefix: mongoose.model('FunctionSuffixPrefix', FunctionSuffixPrefixSchema),
 };
