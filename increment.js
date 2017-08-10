@@ -48,6 +48,41 @@ function resetSequence(options) {
 }
 
 /**
+ * Calculate the current count
+ *
+ * @param {Object} options Counter options
+ * @param {Number} count current count increment
+ * @param {Object} resource Mongoose model instance
+ *
+ * @return {Number} new count
+ */
+function calculateCount(options, count, resource) {
+  let value = '';
+
+  if (_.isFunction(options.prefix)) {
+    value += options.prefix(resource);
+  }
+  else if(options.prefix) {
+    value += options.prefix.toString();
+  }
+
+  value += count;
+
+  if (options.hasVersion) {
+    value += `${options.delimiterVersion}${options.startVersion}${options.delimiterVersion}`;
+  }
+
+  if (_.isFunction(options.suffix)) {
+    value += options.suffix(resource);
+  }
+  else if(options.suffix) {
+    value += options.suffix.toString();
+  }
+
+  return value;
+}
+
+/**
  * Retrieve the next sequence in the counter and update field
  *
  * @param {Object} options Counter options
@@ -69,24 +104,7 @@ function nextCount(options, resource, next) {
     promise.then((counter) => {
       counter.count += options.increment;
 
-      let value = '';
-      if (_.isFunction(options.prefix)) {
-        value += options.prefix(resource);
-      }
-      else if(options.prefix) {
-        value += options.prefix.toString();
-      }
-
-      value += counter.count;
-
-      if (_.isFunction(options.suffix)) {
-        value += options.suffix(resource);
-      }
-      else if(options.suffix) {
-        value += options.suffix.toString();
-      }
-
-      resource[options.field] = value;
+      resource[options.field] = calculateCount(options, counter.count, resource);
 
       return counter.save(next);
     });
@@ -123,6 +141,13 @@ function parseSequence(options) {
 
   parsed.counter = this[options.field].substring(parsed.prefix.length, this[options.field].length - parsed.suffix.length);
 
+  if (options.hasVersion) {
+    const tab = parsed.counter.split(options.delimiterVersion);
+
+    parsed.counter = tab[0];
+    parsed.version = tab[1];
+  }
+
   return parsed;
 }
 
@@ -139,6 +164,23 @@ function nextSequence(options) {
       (err ? reject(err) : resolve())
     );
   });
+}
+
+/**
+ * Set the next version from the current document version
+ *
+ * @param {Object} options Counter options
+ * @return {Number} new version counter
+ */
+function nextVersion(options) {
+  const opts = _.cloneDeep(options);
+  const parsedSequence = this.parseSequence(options);
+
+  opts.startVersion = Number(parsedSequence.version) + 1;
+
+  this[options.field] = calculateCount(opts, parsedSequence.counter, this);
+
+  return this[options.field];
 }
 
 /**
@@ -168,7 +210,10 @@ function initCounter(options) {
  *   @property {Integer}          [start]     start number for counter, default `1`
  *   @property {Integer}          [increment] number to increment counter, default `1`
  *   @property {String/Function}  [prefix]    counter prefix, default ``
- *   @property {String/Function}  [suffix]    counter suffix, defautl ``
+ *   @property {String/Function}  [suffix]    counter suffix, default ``
+ *   @property {Booleam}          [hasVersion]         has version, default `false`
+ *   @property {Integer}          [startVersion]       start number for versiom, default `1`
+ *   @property {String}           [delimiterVersion]   delimiter for version counter, default `-`
  */
 function plugin(schema, options) {
   if (!_.isPlainObject(options)) {
@@ -186,6 +231,10 @@ function plugin(schema, options) {
   if (options.increment && !_.isInteger(options.increment)) {
     throw new Error('Mongoose Increment Plugin: require `options.increment` parameter must be an integer');
   }
+  if (options.startVersion && !_.isInteger(options.startVersion)) {
+    throw new Error('Mongoose Increment Plugin: require `options.startVersion` parameter must be an integer');
+  }
+
   const opts = {
     model: options.modelName,
     field: options.fieldName,
@@ -194,6 +243,9 @@ function plugin(schema, options) {
     prefix: options.prefix || '',
     suffix: options.suffix || '',
     type: options.type || Number,
+    hasVersion: options.hasVersion || false,
+    startVersion: options.startVersion || 1,
+    delimiterVersion: options.delimiterVersion || '-',
   };
 
   const fieldSchema = {};
@@ -208,6 +260,10 @@ function plugin(schema, options) {
 
   schema.methods.nextSequence = _.partial(nextSequence, opts);
   schema.methods.parseSequence = _.partial(parseSequence, opts);
+
+  if (opts.hasVersion) {
+    schema.methods.nextVersion = _.partial(nextVersion, opts);
+  }
 
   schema.statics.resetSequence = _.partial(resetSequence, opts);
 

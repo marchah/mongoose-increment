@@ -80,10 +80,33 @@ FunctionSuffixPrefixSchema.plugin(increment, {
   suffix: (doc) => {  return doc.flag ? '-S-TRUE' : '-S-FALSE' },
 });
 
+const FunctionSuffixPrefixVersionSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+  flag: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+FunctionSuffixPrefixVersionSchema.plugin(increment, {
+  type: String,
+  modelName: 'FunctionSuffixPrefixVersion',
+  fieldName: 'increment_field',
+  start: 300,
+  increment: 3,
+  prefix: (doc) => {  return doc.flag ? 'P-TRUE-' : 'P-FALSE-' },
+  suffix: (doc) => {  return doc.flag ? 'S-TRUE' : 'S-FALSE' },
+  hasVersion: true,
+});
+
 module.exports = {
   Default: mongoose.model('Default', DefaultSchema),
   String: mongoose.model('String', StringSchema),
   BasicSuffixPrefix: mongoose.model('BasicSuffixPrefix', BasicSuffixPrefixSchema),
   BasicStringSuffixPrefix: mongoose.model('BasicStringSuffixPrefix', BasicStringSuffixPrefixSchema),
   FunctionSuffixPrefix: mongoose.model('FunctionSuffixPrefix', FunctionSuffixPrefixSchema),
+  FunctionSuffixPrefixVersion: mongoose.model('FunctionSuffixPrefixVersion', FunctionSuffixPrefixVersionSchema),
 };

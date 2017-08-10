@@ -134,6 +134,30 @@ describe('Unit Testing ->', () => {
       }
     });
 
+    it('should throw error when `options.startVersion` is not an integer', (done) => {
+      const TestSchema = new mongoose.Schema({
+        label: {
+          type: String,
+          required: true,
+        },
+      });
+
+      try {
+        TestSchema.plugin(increment, {
+          modelName: 'Test',
+          fieldName: 'increment_field',
+          start: 12,
+          startVersion: 12.12,
+        });
+        done('Not supposed to happend');
+      }
+      catch (error) {
+        expect(error).that.is.an.instanceof(Error)
+          .to.have.property('message', 'Mongoose Increment Plugin: require `options.startVersion` parameter must be an integer');
+        done();
+      }
+    });
+
     it('should add field `increment_field` to mongoose schema', () => {
       const TestSchema = new mongoose.Schema({
         label: {
@@ -177,6 +201,37 @@ describe('Unit Testing ->', () => {
         fieldName: 'increment_field',
       });
       expect(TestSchema.methods.parseSequence).to.exist;
+    });
+
+    it('should not add method `parseSequence` to mongoose schema', () => {
+      const TestSchema = new mongoose.Schema({
+        label: {
+          type: String,
+          required: true,
+        },
+      });
+      expect(TestSchema.methods.nextVersion).to.not.exist;
+      TestSchema.plugin(increment, {
+        modelName: 'Test',
+        fieldName: 'increment_field',
+      });
+      expect(TestSchema.methods.nextVersion).not.to.exist;
+    });
+
+    it('should add method `parseSequence` to mongoose schema when `hasVersion` is `true`', () => {
+      const TestSchema = new mongoose.Schema({
+        label: {
+          type: String,
+          required: true,
+        },
+      });
+      expect(TestSchema.methods.nextVersion).to.not.exist;
+      TestSchema.plugin(increment, {
+        modelName: 'Test',
+        fieldName: 'increment_field',
+        hasVersion: true,
+      });
+      expect(TestSchema.methods.nextVersion).to.exist;
     });
 
     it('should add static `resetSequence` to mongoose schema', () => {
@@ -668,6 +723,140 @@ describe('Unit Testing ->', () => {
               prefix: 'P-TRUE-',
               counter: '300',
               suffix: '-S-TRUE',
+            });
+            done();
+          }).catch(done);
+      });
+    });
+
+    describe('Function Suffix/Prefix And Start And Increment And Sub Increment Options', () => {
+      let savedDoc;
+
+      it('should save `increment_field` field with `P-TRUE-300-S-TRUE` as value by default 1/2', (done) => {
+        const doc = new models.FunctionSuffixPrefixVersion({
+          label: 'label_1',
+          flag: true,
+        });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 'P-TRUE-300-1-S-TRUE');
+            savedDoc = doc;
+            done();
+          }).catch(done);
+      });
+
+      it('should return correct parsed sequence', () => {
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: 'P-TRUE-',
+          counter: '300',
+          version: '1',
+          suffix: 'S-TRUE',
+        });
+      });
+
+      it('should update `increment_field` version 1/2', () => {
+        expect(savedDoc.increment_field).to.eql('P-TRUE-300-1-S-TRUE');
+
+        savedDoc.nextVersion();
+
+        expect(savedDoc.increment_field).to.eql('P-TRUE-300-2-S-TRUE');
+
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: 'P-TRUE-',
+          counter: '300',
+          version: '2',
+          suffix: 'S-TRUE',
+        });
+      });
+
+      it('should save `increment_field` field with `P-FALSE-303-S-FALSE` as value by default', (done) => {
+        const doc = new models.FunctionSuffixPrefixVersion({ label: 'label_2', flag: false  });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 'P-FALSE-303-1-S-FALSE');
+            expect(doc.parseSequence()).to.eql({
+              prefix: 'P-FALSE-',
+              counter: '303',
+              version: '1',
+              suffix: 'S-FALSE',
+            });
+            done();
+          }).catch(done);
+      });
+
+      it('should set `increment_field` field with `P-TRUE-306-S-TRUE` when call method `nextSequence`', (done) => {
+        const doc = new models.FunctionSuffixPrefixVersion({ label: 'label_3', flag: true  });
+
+        doc.nextSequence()
+          .then(() => {
+             expect(doc).that.is.an('object')
+              .to.have.property('increment_field', 'P-TRUE-306-1-S-TRUE');
+            done();
+          }).catch(done);
+      });
+
+      it('should not changed `increment_field` is doc is not new', (done) => {
+        expect(savedDoc).that.is.an('object')
+          .to.have.property('increment_field', 'P-TRUE-300-2-S-TRUE');
+        savedDoc.label = 'label_4';
+
+        savedDoc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 'P-TRUE-300-2-S-TRUE');
+            done();
+          }).catch(done);
+      });
+
+      it('should update `increment_field` version 2/2', () => {
+        expect(savedDoc.increment_field).to.eql('P-TRUE-300-2-S-TRUE');
+
+        savedDoc.nextVersion();
+
+        expect(savedDoc.increment_field).to.eql('P-TRUE-300-3-S-TRUE');
+
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: 'P-TRUE-',
+          counter: '300',
+          version: '3',
+          suffix: 'S-TRUE',
+        });
+      });
+
+      it('should not set `increment_field` if doc is new and `increment_field` is not undefined', (done) => {
+        const doc = new models.FunctionSuffixPrefixVersion({ label: 'label_5', flag: true, increment_field: 99 });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', '99');
+            done();
+          }).catch(done);
+      });
+
+      it('should reset sequence and delete the first doc created', (done) => {
+        models.FunctionSuffixPrefixVersion.resetSequence()
+          .then(() => {
+            return savedDoc.remove(done);
+          }).catch(done);
+      });
+
+      it('should save `increment_field` field with `P-TRUE-300-S-TRUE` as value by default 2/2', (done) => {
+        const doc = new models.FunctionSuffixPrefixVersion({ label: 'label_6', flag: true });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 'P-TRUE-300-1-S-TRUE');
+            expect(doc.parseSequence()).to.eql({
+              prefix: 'P-TRUE-',
+              counter: '300',
+              version: '1',
+              suffix: 'S-TRUE',
             });
             done();
           }).catch(done);
