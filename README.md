@@ -13,13 +13,16 @@ $ npm install mongoose-increment
 
 ### Options
 
-* `type`      {Type} field type (optional, default value is `Number`)
-* `modelName` {String} mongoose model name
-* `fieldName` {String} mongoose increment field name
-* `start`     {Integer} start number for counter (optional, default `1`)
-* `increment` {Integer} number to increment counter (optional, default `1`)
-* `prefix`    {String/Function} counter prefix (optional, default value is an empty `String`)
-* `suffix`    {String/Function} counter suffix (optional, default value is an empty `String`)
+* `type`             {Type} field type (optional, default value is `Number`)
+* `modelName`        {String} mongoose model name
+* `fieldName`        {String} mongoose increment field name
+* `start`            {Integer} start number for counter (optional, default `1`)
+* `increment`        {Integer} number to increment counter (optional, default `1`)
+* `prefix`           {String/Function} counter prefix (optional, default value is an empty `String`)
+* `suffix`           {String/Function} counter suffix (optional, default value is an empty `String`)
+* `hasVersion`       {Boolean} has version (optional, default `false`)
+* `startVersion`     {Integer} start number for version (optional, default `1`)
+* `delimiterVersion` {String} delimiter for version counter (optional, default `-`)
 
 ### Methods
 
@@ -30,6 +33,10 @@ Return a fulfilled promise when increment field has been setted
 #### instance.parseSequence()
 
 Return an object which contain instance prefix, suffix and counter.
+
+#### instance.nextVersion() is `hasVersion` is `true`
+
+Set the next version from the current document version.
 
 ### Statics
 
@@ -157,6 +164,32 @@ TestIncrement.resetSequence();
 var doc2 = new TestIncrement({ label: 'label_1', flag: false });
 doc2.save(); // doc saved with `increment_field` === 'P1FALSE'
 doc2.parseSequence(); // => { prefix: 'P', counter: '1', suffix: 'FALSE' }
+````
+
+### `hasVersion` true
+````javascript
+var mongoose = require('mongoose');
+var increment = require('mongoose-increment');
+
+var TestSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+
+TestSchema.plugin(increment, {
+  modelName: 'Test_increment',
+  fieldName: 'increment_field',
+  hasVersion: true,
+  startVersion: 0,
+});
+
+var TestIncrement = mongoose.model('Test_increment', TestSchema);
+
+var doc = new TestIncrement({ label: 'label_1' });
+
+doc.save(); // doc saved with `increment_field` === 1-0-
 ````
 
 ## Note
