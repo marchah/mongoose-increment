@@ -211,8 +211,8 @@ function initCounter(options) {
  *   @property {Integer}          [increment] number to increment counter, default `1`
  *   @property {String/Function}  [prefix]    counter prefix, default ``
  *   @property {String/Function}  [suffix]    counter suffix, default ``
- *   @property {Booleam}          [hasVersion]         has version, default `false`
- *   @property {Integer}          [startVersion]       start number for versiom, default `1`
+ *   @property {Boolean}          [hasVersion]         has version, default `false`
+ *   @property {Integer}          [startVersion]       start number for version, default `1`
  *   @property {String}           [delimiterVersion]   delimiter for version counter, default `-`
  */
 function plugin(schema, options) {
