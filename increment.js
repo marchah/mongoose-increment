@@ -105,7 +105,7 @@ function nextCount(options, resource, next) {
       counter.count += options.increment;
 
       if (options.resetAfter > 0 && counter.count > options.resetAfter) {
-        counter.count = options.start - options.increment;
+        counter.count = options.start;
       }
 
       resource[options.field] = calculateCount(options, counter.count, resource);
