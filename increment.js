@@ -104,6 +104,10 @@ function nextCount(options, resource, next) {
     promise.then((counter) => {
       counter.count += options.increment;
 
+      if (options.resetAfter > 0 && counter.count > options.resetAfter) {
+        counter.count = options.start - options.increment;
+      }
+
       resource[options.field] = calculateCount(options, counter.count, resource);
 
       return counter.save(next);
@@ -205,12 +209,14 @@ function initCounter(options) {
  *
  * @param {Object} schema Mongoose schema
  * @param {Options} options Additional options for autoincremented field
- *   @property {String}           modelName   mongoose model name
- *   @property {String}           fieldName       mongoose increment field name
- *   @property {Integer}          [start]     start number for counter, default `1`
- *   @property {Integer}          [increment] number to increment counter, default `1`
- *   @property {String/Function}  [prefix]    counter prefix, default ``
- *   @property {String/Function}  [suffix]    counter suffix, default ``
+ *   @property {String}           modelName            mongoose model name
+ *   @property {String}           fieldName            mongoose increment field name
+ *   @property {Integer}          [start]              start number for counter, default `1`
+ *   @property {Integer}          [increment]          number to increment counter, default `1`
+ *   @property {String/Function}  [prefix]             counter prefix, default ``
+ *   @property {String/Function}  [suffix]             counter suffix, default ``
+ *   @property {Boolean}          [unique]             unique field, default `true`
+ *   @property {Integer}          [resetAfter]         reset counter, default `0`
  *   @property {Boolean}          [hasVersion]         has version, default `false`
  *   @property {Integer}          [startVersion]       start number for version, default `1`
  *   @property {String}           [delimiterVersion]   delimiter for version counter, default `-`
@@ -243,6 +249,8 @@ function plugin(schema, options) {
     prefix: options.prefix || '',
     suffix: options.suffix || '',
     type: options.type || Number,
+    unique: options.unique || true,
+    resetAfter: options.resetAfter || 0,
     hasVersion: options.hasVersion || false,
     startVersion: options.startVersion || 1,
     delimiterVersion: options.delimiterVersion || '-',
@@ -253,7 +261,7 @@ function plugin(schema, options) {
   fieldSchema[opts.field] = {
     type: opts.type,
     require: true,
-    unique: true,
+    unique: opts.unique,
   };
 
   schema.add(fieldSchema);

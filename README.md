@@ -20,6 +20,8 @@ $ npm install mongoose-increment
 * `increment`        {Integer} number to increment counter (optional, default `1`)
 * `prefix`           {String/Function} counter prefix (optional, default value is an empty `String`)
 * `suffix`           {String/Function} counter suffix (optional, default value is an empty `String`)
+* `unique`           {Boolean} unique field (optional, default `true`)
+* `resetAfter`       {Integer} reset counter (optional, default `0`)
 * `hasVersion`       {Boolean} has version (optional, default `false`)
 * `startVersion`     {Integer} start number for version (optional, default `1`)
 * `delimiterVersion` {String} delimiter for version counter (optional, default `-`)
