@@ -249,12 +249,14 @@ function plugin(schema, options) {
     prefix: options.prefix || '',
     suffix: options.suffix || '',
     type: options.type || Number,
-    unique: options.unique || true,
+    unique: options.unique,
     resetAfter: options.resetAfter || 0,
     hasVersion: options.hasVersion || false,
     startVersion: options.startVersion || 1,
     delimiterVersion: options.delimiterVersion || '-',
   };
+    
+  if (opts.unique !== false) opts.unique = true;
 
   const fieldSchema = {};
 
