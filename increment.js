@@ -6,7 +6,7 @@
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
-mongoose.Promise = Promise;
+
 /**
  * Setup counter schema and model
  *
@@ -27,6 +27,10 @@ const CounterSchema = new mongoose.Schema({
   },
 });
 
+CounterSchema.index(
+  { field: 1, model: 1 },
+  { unique: true, required: true, index: -1 }
+);
 
 const Counter = mongoose.model('_Counter', CounterSchema);
 
@@ -38,9 +42,9 @@ const Counter = mongoose.model('_Counter', CounterSchema);
  */
 function resetSequence(options) {
   return Counter.findOneAndUpdate(
-    {model: options.model, field: options.field},
-    {count: options.start - options.increment},
-    {new: true, upsert: true});
+    { model: options.model, field: options.field },
+    { count: options.start - options.increment },
+    { new: true, upsert: true });
 }
 
 /**
@@ -58,7 +62,7 @@ function calculateCount(options, count, resource) {
   if (_.isFunction(options.prefix)) {
     value += options.prefix(resource);
   }
-  else if (options.prefix) {
+  else if(options.prefix) {
     value += options.prefix.toString();
   }
 
@@ -71,7 +75,7 @@ function calculateCount(options, count, resource) {
   if (_.isFunction(options.suffix)) {
     value += options.suffix(resource);
   }
-  else if (options.suffix) {
+  else if(options.suffix) {
     value += options.suffix.toString();
   }
 
@@ -86,41 +90,26 @@ function calculateCount(options, count, resource) {
  * @param {Function} next Callback handler
  */
 function nextCount(options, resource, next) {
-
   if (!resource.isNew || !_.isUndefined(resource[options.field])) {
-   
-     return next();
+    return next();
   }
-
-  console.log(JSON.stringify(options))
-
- return  Promise.resolve( Counter.findOne({
+  return Counter.findOne({
     model: options.model,
     field: options.field,
-  }, function (err, item) {
-  
-    if (err) {
-      return next;
-    }
-   
+  }).then((item) => {
     let promise = Promise.resolve(item);
     if (!item) {
-    
       promise = initCounter(options);
     }
     promise.then((counter) => {
-      
       counter.count += options.increment;
 
       resource[options.field] = calculateCount(options, counter.count, resource);
-      
+
       return counter.save(next);
-    })
-    })).catch(function (err) {
-
-   next();})
+    });
+  }).catch(next);
 }
-
 
 /**
  * Parse the sequence to get the prefix, counter and suffix
@@ -139,14 +128,14 @@ function parseSequence(options) {
   if (_.isFunction(options.prefix)) {
     parsed.prefix = options.prefix(this);
   }
-  else if (options.prefix) {
+  else if(options.prefix) {
     parsed.prefix = options.prefix.toString();
   }
 
   if (_.isFunction(options.suffix)) {
     parsed.suffix = options.suffix(this);
   }
-  else if (options.suffix) {
+  else if(options.suffix) {
     parsed.suffix = options.suffix.toString();
   }
 
@@ -266,8 +255,6 @@ function plugin(schema, options) {
     require: true,
     unique: true,
   };
-  console.log("***********");
-  console.log(JSON.stringify(fieldSchema));
 
   schema.add(fieldSchema);
 
