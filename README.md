@@ -72,6 +72,40 @@ var doc = new TestIncrement({ label: 'label_1' });
 doc.save(); // doc saved with `increment_field` === 1
 ````
 
+### resetAfter and unique options
+````javascript
+var mongoose = require('mongoose');
+var increment = require('mongoose-increment');
+
+var TestSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+
+TestSchema.plugin(increment, {
+  modelName: 'Test_increment',
+  fieldName: 'increment_field',
+  unique: false,
+  resetAfter: 2,
+});
+
+var TestIncrement = mongoose.model('Test_increment', TestSchema);
+
+var doc1 = new TestIncrement({ label: 'label_1' });
+
+doc1.save(); // doc1 saved with `increment_field` === 1
+
+var doc2 = new TestIncrement({ label: 'label_2' });
+
+doc2.save(); // doc2 saved with `increment_field` === 2
+
+var doc3 = new TestIncrement({ label: 'label_3' });
+
+doc3.save(); // doc3 saved with `increment_field` === 1
+````
+
 ### type option
 ````javascript
 var mongoose = require('mongoose');
