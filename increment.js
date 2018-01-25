@@ -139,7 +139,17 @@ function parseSequence(options) {
     parsed.suffix = options.suffix.toString();
   }
 
-  parsed.counter = this[options.field].substring(parsed.prefix.length, this[options.field].length - parsed.suffix.length);
+  let counter = this[options.field];
+
+  if (_.isNumber(this[options.field])) {
+    counter = String(counter);
+  }
+
+  parsed.counter = counter.substring(parsed.prefix.length, counter.length - parsed.suffix.length);
+
+  if (_.isNumber(this[options.field])) {
+    parsed.counter = Number(parsed.counter);
+  }
 
   if (options.hasVersion) {
     const tab = parsed.counter.split(options.delimiterVersion);

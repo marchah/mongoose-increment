@@ -282,7 +282,7 @@ describe('Unit Testing ->', () => {
       it('should return correct parsed sequence with default', () => {
         expect(savedDocDefault.parseSequence()).to.eql({
           prefix: '',
-          counter: '1',
+          counter: 1,
           suffix: '',
         });
       });
@@ -304,7 +304,7 @@ describe('Unit Testing ->', () => {
               .to.have.property('increment_field', 2);
             expect(doc.parseSequence()).to.eql({
               prefix: '',
-              counter: '2',
+              counter: 2,
               suffix: '',
             });
             done();
@@ -405,7 +405,7 @@ describe('Unit Testing ->', () => {
               .to.have.property('increment_field', 1);
             expect(doc.parseSequence()).to.eql({
               prefix: '',
-              counter: '1',
+              counter: 1,
               suffix: '',
             });
             savedDocDefault = doc;
@@ -468,9 +468,9 @@ describe('Unit Testing ->', () => {
 
       it('should return correct parsed sequence with default', () => {
         expect(savedDocDefault.parseSequence()).to.eql({
-          prefix: 1,
+          prefix: '1',
           counter: 500,
-          suffix: 9,
+          suffix: '9',
         });
       });
 
@@ -490,9 +490,9 @@ describe('Unit Testing ->', () => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', 15019);
             expect(doc.parseSequence()).to.eql({
-              prefix: 1,
+              prefix: '1',
               counter: 501,
-              suffix: 9,
+              suffix: '9',
             });
             done();
           }).catch(done);
@@ -606,9 +606,9 @@ describe('Unit Testing ->', () => {
             expect(res).that.is.an('object')
               .to.have.property('increment_field', 15009);
             expect(doc.parseSequence()).to.eql({
-              prefix: 1,
+              prefix: '1',
               counter: 500,
-              suffix: 9,
+              suffix: '9',
             });
             done();
           }).catch(done);
