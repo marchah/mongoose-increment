@@ -27,11 +27,6 @@ const CounterSchema = new mongoose.Schema({
   },
 });
 
-CounterSchema.index(
-  { field: 1, model: 1 },
-  { unique: true, required: true, index: -1 }
-);
-
 const Counter = mongoose.model('_Counter', CounterSchema);
 
 /**
