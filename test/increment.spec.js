@@ -431,6 +431,104 @@ describe('Unit Testing ->', () => {
       });
     });
 
+    describe('Reset And Unique Options', () => {
+      let savedDoc;
+
+      it('should save `increment_field` field with `1` as value by default 1/2', (done) => {
+        const doc = new models.ResetUniqueSchema({ label: 'label_1' });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 1);
+            savedDoc = doc;
+            done();
+          }).catch(done);
+      });
+
+      it('should return correct parsed sequence with default', () => {
+        expect(savedDoc.parseSequence()).to.eql({
+          prefix: '',
+          counter: 1,
+          suffix: '',
+        });
+      });
+
+      it('should save `increment_field` field with `2` as value by default', (done) => {
+        const doc = new models.ResetUniqueSchema({ label: 'label_2' });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 2);
+            expect(doc.parseSequence()).to.eql({
+              prefix: '',
+              counter: 2,
+              suffix: '',
+            });
+            done();
+          }).catch(done);
+      });
+
+      it('should reset `increment_field` field to `1` when call method `nextSequence`', (done) => {
+        const doc = new models.ResetUniqueSchema({ label: 'label_3' });
+
+        doc.nextSequence()
+          .then(() => {
+             expect(doc).that.is.an('object')
+              .to.have.property('increment_field', 1);
+            done();
+          }).catch(done);
+      });
+
+      it('should not changed `increment_field` is doc is not new', (done) => {
+        expect(savedDoc).that.is.an('object')
+          .to.have.property('increment_field', 1);
+        savedDoc.label = 'label_4';
+
+        savedDoc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 1);
+            done();
+          }).catch(done);
+      });
+
+      it('should not set `increment_field` if doc is new and `increment_field` is not undefined with default', (done) => {
+        const doc = new models.ResetUniqueSchema({ label: 'label_5', increment_field: 99 });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 99);
+            done();
+          }).catch(done);
+      });
+
+      it('should reset sequence and delete the first doc created', (done) => {
+        models.ResetUniqueSchema.resetSequence()
+          .then(() => savedDoc.remove(done))
+          .catch(done);
+      });
+
+      it('should save `increment_field` field with `1` as value by default 2/2', (done) => {
+        const doc = new models.ResetUniqueSchema({ label: 'label_6' });
+
+        doc.save()
+          .then((res) => {
+            expect(res).that.is.an('object')
+              .to.have.property('increment_field', 1);
+            expect(doc.parseSequence()).to.eql({
+              prefix: '',
+              counter: 1,
+              suffix: '',
+            });
+            savedDoc = doc;
+            done();
+          }).catch(done);
+      });
+    });
+
     describe('Basic Suffix/Prefix And Start Options', () => {
       let savedDocDefault;
       let savedDocString;
