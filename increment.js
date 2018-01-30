@@ -6,7 +6,7 @@
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
-mongoose.Promise = Promise;
+
 /**
  * Setup counter schema and model
  *
@@ -88,32 +88,31 @@ function calculateCount(options, count, resource) {
 function nextCount(options, resource, next) {
 
   if (!resource.isNew || !_.isUndefined(resource[options.field])) {
-   
+
      return next();
   }
 
-  console.log(JSON.stringify(options))
-
+ 
  return  Promise.resolve( Counter.findOne({
     model: options.model,
     field: options.field,
   }, function (err, item) {
-  
+
     if (err) {
       return next;
     }
-   
+
     let promise = Promise.resolve(item);
     if (!item) {
-    
+
       promise = initCounter(options);
     }
     promise.then((counter) => {
-      
+
       counter.count += options.increment;
 
       resource[options.field] = calculateCount(options, counter.count, resource);
-      
+
       return counter.save(next);
     })
     })).catch(function (err) {
@@ -266,10 +265,14 @@ function plugin(schema, options) {
     require: true,
     unique: true,
   };
-  console.log("***********");
-  console.log(JSON.stringify(fieldSchema));
+  // if field has already defined and holds some custom keys or ... merge with new fieldSchema(in my case some admin fields)
+  fieldSchema[opts.field] = _.merge(fieldSchema[opts.field],schema.path(opts.field) !== undefined ? schema.path(opts.field).options: {});
+
+
 
   schema.add(fieldSchema);
+
+
 
   schema.methods.nextSequence = _.partial(nextSequence, opts);
   schema.methods.parseSequence = _.partial(parseSequence, opts);

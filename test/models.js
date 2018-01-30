@@ -15,6 +15,20 @@ DefaultSchema.plugin(increment, {
   fieldName: 'increment_field',
 });
 
+const ResetUniqueSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+
+ResetUniqueSchema.plugin(increment, {
+  modelName: 'ResetUniqueSchema',
+  fieldName: 'increment_field',
+  unique: false,
+  resetAfter: 2,
+});
+
 const StringSchema = new mongoose.Schema({
   label: {
     type: String,
@@ -104,6 +118,7 @@ FunctionSuffixPrefixVersionSchema.plugin(increment, {
 
 module.exports = {
   Default: mongoose.model('Default', DefaultSchema),
+  ResetUniqueSchema: mongoose.model('ResetUnique', ResetUniqueSchema),
   String: mongoose.model('String', StringSchema),
   BasicSuffixPrefix: mongoose.model('BasicSuffixPrefix', BasicSuffixPrefixSchema),
   BasicStringSuffixPrefix: mongoose.model('BasicStringSuffixPrefix', BasicStringSuffixPrefixSchema),
