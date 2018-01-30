@@ -27,6 +27,7 @@ const CounterSchema = new mongoose.Schema({
   },
 });
 
+
 const Counter = mongoose.model('_Counter', CounterSchema);
 
 /**
@@ -37,9 +38,9 @@ const Counter = mongoose.model('_Counter', CounterSchema);
  */
 function resetSequence(options) {
   return Counter.findOneAndUpdate(
-    { model: options.model, field: options.field },
-    { count: options.start - options.increment },
-    { new: true, upsert: true });
+    {model: options.model, field: options.field},
+    {count: options.start - options.increment},
+    {new: true, upsert: true});
 }
 
 /**
@@ -57,7 +58,7 @@ function calculateCount(options, count, resource) {
   if (_.isFunction(options.prefix)) {
     value += options.prefix(resource);
   }
-  else if(options.prefix) {
+  else if (options.prefix) {
     value += options.prefix.toString();
   }
 
@@ -70,7 +71,7 @@ function calculateCount(options, count, resource) {
   if (_.isFunction(options.suffix)) {
     value += options.suffix(resource);
   }
-  else if(options.suffix) {
+  else if (options.suffix) {
     value += options.suffix.toString();
   }
 
@@ -85,30 +86,40 @@ function calculateCount(options, count, resource) {
  * @param {Function} next Callback handler
  */
 function nextCount(options, resource, next) {
+
   if (!resource.isNew || !_.isUndefined(resource[options.field])) {
-    return next();
+
+     return next();
   }
-  return Counter.findOne({
+
+ 
+ return  Promise.resolve( Counter.findOne({
     model: options.model,
     field: options.field,
-  }).then((item) => {
+  }, function (err, item) {
+
+    if (err) {
+      return next;
+    }
+
     let promise = Promise.resolve(item);
     if (!item) {
+
       promise = initCounter(options);
     }
     promise.then((counter) => {
-      counter.count += options.increment;
 
-      if (options.resetAfter > 0 && counter.count > options.resetAfter) {
-        counter.count = options.start;
-      }
+      counter.count += options.increment;
 
       resource[options.field] = calculateCount(options, counter.count, resource);
 
       return counter.save(next);
-    });
-  }).catch(next);
+    })
+    })).catch(function (err) {
+
+   next();})
 }
+
 
 /**
  * Parse the sequence to get the prefix, counter and suffix
@@ -127,28 +138,18 @@ function parseSequence(options) {
   if (_.isFunction(options.prefix)) {
     parsed.prefix = options.prefix(this);
   }
-  else if(options.prefix) {
+  else if (options.prefix) {
     parsed.prefix = options.prefix.toString();
   }
 
   if (_.isFunction(options.suffix)) {
     parsed.suffix = options.suffix(this);
   }
-  else if(options.suffix) {
+  else if (options.suffix) {
     parsed.suffix = options.suffix.toString();
   }
 
-  let counter = this[options.field];
-
-  if (_.isNumber(this[options.field])) {
-    counter = String(counter);
-  }
-
-  parsed.counter = counter.substring(parsed.prefix.length, counter.length - parsed.suffix.length);
-
-  if (_.isNumber(this[options.field])) {
-    parsed.counter = Number(parsed.counter);
-  }
+  parsed.counter = this[options.field].substring(parsed.prefix.length, this[options.field].length - parsed.suffix.length);
 
   if (options.hasVersion) {
     const tab = parsed.counter.split(options.delimiterVersion);
@@ -214,14 +215,12 @@ function initCounter(options) {
  *
  * @param {Object} schema Mongoose schema
  * @param {Options} options Additional options for autoincremented field
- *   @property {String}           modelName            mongoose model name
- *   @property {String}           fieldName            mongoose increment field name
- *   @property {Integer}          [start]              start number for counter, default `1`
- *   @property {Integer}          [increment]          number to increment counter, default `1`
- *   @property {String/Function}  [prefix]             counter prefix, default ``
- *   @property {String/Function}  [suffix]             counter suffix, default ``
- *   @property {Boolean}          [unique]             unique field, default `true`
- *   @property {Integer}          [resetAfter]         reset counter, default `0`
+ *   @property {String}           modelName   mongoose model name
+ *   @property {String}           fieldName       mongoose increment field name
+ *   @property {Integer}          [start]     start number for counter, default `1`
+ *   @property {Integer}          [increment] number to increment counter, default `1`
+ *   @property {String/Function}  [prefix]    counter prefix, default ``
+ *   @property {String/Function}  [suffix]    counter suffix, default ``
  *   @property {Boolean}          [hasVersion]         has version, default `false`
  *   @property {Integer}          [startVersion]       start number for version, default `1`
  *   @property {String}           [delimiterVersion]   delimiter for version counter, default `-`
@@ -254,24 +253,26 @@ function plugin(schema, options) {
     prefix: options.prefix || '',
     suffix: options.suffix || '',
     type: options.type || Number,
-    unique: options.unique,
-    resetAfter: options.resetAfter || 0,
     hasVersion: options.hasVersion || false,
     startVersion: options.startVersion || 1,
     delimiterVersion: options.delimiterVersion || '-',
   };
-    
-  if (opts.unique !== false) opts.unique = true;
 
   const fieldSchema = {};
 
   fieldSchema[opts.field] = {
     type: opts.type,
     require: true,
-    unique: opts.unique,
+    unique: true,
   };
+  // if field has already defined and holds some custom keys or ... merge with new fieldSchema(in my case some admin fields)
+  fieldSchema[opts.field] = _.merge(fieldSchema[opts.field],schema.path(opts.field) !== undefined ? schema.path(opts.field).options: {});
+
+
 
   schema.add(fieldSchema);
+
+
 
   schema.methods.nextSequence = _.partial(nextSequence, opts);
   schema.methods.parseSequence = _.partial(parseSequence, opts);
