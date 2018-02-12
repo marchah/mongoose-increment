@@ -51,7 +51,8 @@ Return a fulfilled promise when sequence has been reset
 ### default option
 ````javascript
 var mongoose = require('mongoose');
-var increment = require('mongoose-increment');
+var mongooseIncrement = require('mongoose-increment');
+var increment = mongooseIncrement(mongoose);
 
 var TestSchema = new mongoose.Schema({
   label: {
@@ -75,7 +76,8 @@ doc.save(); // doc saved with `increment_field` === 1
 ### type option
 ````javascript
 var mongoose = require('mongoose');
-var increment = require('mongoose-increment');
+var mongooseIncrement = require('mongoose-increment');
+var increment = mongooseIncrement(mongoose);
 
 var TestSchema = new mongoose.Schema({
   label: {
@@ -101,7 +103,8 @@ doc.save(); // doc saved with `increment_field` === '1'
 
 ````javascript
 var mongoose = require('mongoose');
-var increment = require('mongoose-increment');
+var mongooseIncrement = require('mongoose-increment');
+var increment = mongooseIncrement(mongoose);
 
 var TestSchema = new mongoose.Schema({
   label: {
@@ -132,7 +135,8 @@ doc1.parseSequence(); // => { prefix: '', counter: 303, suffix: '' }
 ### `resetAfter` and `unique` options
 ````javascript
 var mongoose = require('mongoose');
-var increment = require('mongoose-increment');
+var mongooseIncrement = require('mongoose-increment');
+var increment = mongooseIncrement(mongoose);
 
 var TestSchema = new mongoose.Schema({
   label: {
@@ -166,7 +170,8 @@ doc3.save(); // doc3 saved with `increment_field` === 1
 ### `prefix` and `suffix` set
 ````javascript
 var mongoose = require('mongoose');
-var increment = require('mongoose-increment');
+var mongooseIncrement = require('mongoose-increment');
+var increment = mongooseIncrement(mongoose);
 
 var TestSchema = new mongoose.Schema({
   label: {
@@ -205,7 +210,8 @@ doc2.parseSequence(); // => { prefix: 'P', counter: '1', suffix: 'FALSE' }
 ### `hasVersion` true
 ````javascript
 var mongoose = require('mongoose');
-var increment = require('mongoose-increment');
+var mongooseIncrement = require('mongoose-increment');
+var increment = mongooseIncrement(mongoose);
 
 var TestSchema = new mongoose.Schema({
   label: {
