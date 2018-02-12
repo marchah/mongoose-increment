@@ -12,8 +12,8 @@ const CastError = mongoose.Error.CastError;
 const ValidationError = mongoose.Error.ValidationError;
 const ValidatorError = mongoose.Error.ValidatorError;
 
-const increment = require('../increment');
-const models = require('./models');
+const increment = require('../increment')(mongoose);
+const models = require('./models')(increment);
 
 describe('Unit Testing ->', () => {
   before((done) => {
