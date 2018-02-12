@@ -57,7 +57,7 @@ function calculateCount(options, count, resource) {
   if (_.isFunction(options.prefix)) {
     value += options.prefix(resource);
   }
-  else if(options.prefix) {
+  else if (options.prefix) {
     value += options.prefix.toString();
   }
 
@@ -70,7 +70,7 @@ function calculateCount(options, count, resource) {
   if (_.isFunction(options.suffix)) {
     value += options.suffix(resource);
   }
-  else if(options.suffix) {
+  else if (options.suffix) {
     value += options.suffix.toString();
   }
 
@@ -127,14 +127,14 @@ function parseSequence(options) {
   if (_.isFunction(options.prefix)) {
     parsed.prefix = options.prefix(this);
   }
-  else if(options.prefix) {
+  else if (options.prefix) {
     parsed.prefix = options.prefix.toString();
   }
 
   if (_.isFunction(options.suffix)) {
     parsed.suffix = options.suffix(this);
   }
-  else if(options.suffix) {
+  else if (options.suffix) {
     parsed.suffix = options.suffix.toString();
   }
 
